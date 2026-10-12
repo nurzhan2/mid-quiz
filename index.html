@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0f1020">
+<title>MID v1–v2 · InfoSec Quiz</title>
+<style>
+:root{--bg:#0f1020;--card:#1a1b33;--txt:#eef0ff;--mut:#9aa0c7;--acc:#7c5cff;--acc2:#22d3ee;--ok:#22c55e;--bad:#ef4444}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;background:radial-gradient(1200px 600px at 10% -10%,#2a1f6b 0,transparent 60%),radial-gradient(900px 500px at 110% 10%,#0b4a5c 0,transparent 55%),var(--bg);color:var(--txt);min-height:100vh}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:26px;margin:18px 0 4px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);margin:0 0 22px}
+.btn{display:block;width:100%;border:0;border-radius:999px;padding:16px 22px;font-size:16px;font-weight:600;color:#fff;background:linear-gradient(90deg,var(--acc),#5b8cff);margin:10px 0;cursor:pointer;transition:transform .15s,box-shadow .2s;box-shadow:0 8px 24px rgba(124,92,255,.35)}
+.btn:active{transform:scale(.96)}
+.btn.ghost{background:#24264a;box-shadow:none}
+.btn.cyan{background:linear-gradient(90deg,#06b6d4,#22d3ee);box-shadow:0 8px 24px rgba(34,211,238,.3)}
+.tog{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:999px;padding:12px 18px;margin:14px 0;color:var(--mut)}
+.sw{width:52px;height:30px;border-radius:999px;background:#33365f;position:relative;transition:.25s;cursor:pointer}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.25s}
+.sw.on{background:var(--acc)}.sw.on::after{left:25px}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:14px;margin-bottom:8px}
+.x{border:0;background:#24264a;color:var(--mut);width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer}
+.bar{height:8px;background:#24264a;border-radius:999px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:999px;transition:width .4s}
+.card{background:var(--card);border-radius:28px;padding:22px 18px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.tag{display:inline-block;font-size:12px;color:var(--acc2);background:rgba(34,211,238,.12);padding:4px 12px;border-radius:999px;margin-bottom:10px}
+.q{font-size:19px;line-height:1.35;margin:0 0 18px;font-weight:600}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:2px solid #2e3160;background:#20223f;color:var(--txt);border-radius:999px;padding:13px 16px;margin:9px 0;font-size:15px;line-height:1.3;cursor:pointer;transition:transform .12s,background .2s,border-color .2s}
+.opt:active{transform:scale(.97)}
+.opt b{flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#2e3160;font-size:14px;transition:.2s}
+.opt.ok{border-color:var(--ok);background:rgba(34,197,94,.15)}.opt.ok b{background:var(--ok)}
+.opt.bad{border-color:var(--bad);background:rgba(239,68,68,.15);animation:sh .4s}.opt.bad b{background:var(--bad)}
+.opt.dim{opacity:.45}
+@keyframes sh{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.exp{margin-top:14px;padding:14px 16px;border-radius:22px;background:#15162b;color:#d6d9ff;font-size:14.5px;line-height:1.45;animation:in .3s}
+.res{text-align:center}
+.ring{width:170px;height:170px;margin:10px auto 6px;border-radius:50%;display:grid;place-items:center;font-size:38px;font-weight:800;transition:background 1s}
+.ring span{width:136px;height:136px;border-radius:50%;background:var(--card);display:grid;place-items:center}
+.hide{display:none}
+.score{color:var(--mut);font-size:14px}
+.score em{color:var(--ok);font-style:normal;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="menu">
+<h1>InfoSec MID 🔐</h1>
+<p class="sub">Тест по MID v1 и v2. После ответа — объяснение и ключевое слово 🔑</p>
+<button class="btn" onclick="start('v1')">MID v1 · 43 вопроса</button>
+<button class="btn" onclick="start('v2')">MID v2 · 50 вопросов</button>
+<button class="btn cyan" onclick="start('all')">Всё вместе · 93 вопроса</button>
+<div class="tog">Перемешать вопросы<div id="shuf" class="sw on" onclick="this.classList.toggle('on')"></div></div>
+<div class="tog">Перемешать варианты<div id="shufo" class="sw" onclick="this.classList.toggle('on')"></div></div>
+</div>
+<div id="quiz" class="hide">
+<div class="top"><button class="x" onclick="menu()">✕</button><span id="cnt"></span><span class="score">✔ <em id="sc">0</em></span></div>
+<div class="bar"><i id="pb"></i></div>
+<div id="box"></div>
+</div>
+<div id="res" class="hide res"></div>
+</div>
+<script>
+const V1=[
+["What are the three core principles of information security?",["Authentication, Integrity, Confidentiality","Availability, Integrity, Confidentiality","Compliance, Protection, Detection","Accountability, Encryption, Authentication"],1,"Триада CIA: Confidentiality (тайна), Integrity (данные не изменены), Availability (система доступна). 🔑 CIA"],
+["How does encryption contribute to information security?",["It transforms data into unreadable format","It limits access to information","It detects unauthorized access attempts","It removes malware from data"],0,"Шифрование делает данные нечитаемыми без ключа. 🔑 нечитаемо"],
+["What does information integrity ensure?",["Data is accurate and unchanged","Unauthorized access is prevented","Data is encrypted for storage","Information is only available during business hours"],0,"Целостность — данные точные и никто их не изменил. 🔑 неизменность"],
+["Why is availability crucial in information systems?",["It keeps systems operational when needed","It restricts access to sensitive users only","It ensures only encrypted data is transmitted","It enables automatic system updates"],0,"Доступность — система работает, когда она нужна. 🔑 работает когда нужно"],
+["How does information security differ from cybersecurity?",["Cybersecurity is broader and includes management policies","Information security focuses on data, while cybersecurity deals with networks","Cybersecurity only applies to government agencies","Information security focuses only on physical security"],1,"ИБ защищает данные, кибербез — сети и цифровые системы. 🔑 данные vs сети"],
+["Which of the following is NOT an access control measure?",["Passwords","Security badges","Fingerprint scanners","Firewalls"],3,"Пароли, бейджи, отпечатки проверяют человека. Firewall фильтрует трафик. 🔑 firewall = трафик"],
+["What is the primary goal of encryption?",["Protect data from unauthorized access","Improve database performance","Detect data corruption","Manage network traffic"],0,"Цель шифрования — посторонние не прочитают данные. 🔑 защита от доступа"],
+["What is an information security policy?",["A document outlining security rules","Guidelines to ensure system availability","Procedures for malware detection","A backup strategy for data loss"],0,"Политика ИБ — документ с правилами безопасности. 🔑 документ правил"],
+["Which practice enhances security in an organization?",["Disabling antivirus programs","Storing data on unprotected devices","Applying access control to critical resources","Using simple, easy-to-remember passwords"],2,"Контроль доступа к важным ресурсам усиливает защиту, остальное её ослабляет. 🔑 access control"],
+["How does network segmentation improve security?",["Limits the spread of cyberattacks","Reduces network traffic","Prevents external access","Increases data processing speed"],0,"Сеть делят на части — атака остаётся в одном сегменте. 🔑 ограничить распространение"],
+["What are the three main categories of cybersecurity?",["Prevention, Detection, Response","Backup, Restoration, Risk","Assessment, Application, Defense","Encryption, Authentication, Authorization"],0,"Предотвратить, обнаружить, отреагировать. 🔑 P-D-R"],
+["What is the goal of risk analysis in cybersecurity?",["To create firewalls","To identify potential security gaps","To test new software","To install antivirus programs"],1,"Анализ рисков находит слабые места до атаки. 🔑 найти дыры"],
+["What is the purpose of an Intrusion Detection System (IDS)?",["Detect and alert on suspicious activities","Block unauthorized traffic","Monitor employee emails","Perform system backups"],0,"IDS замечает подозрительное и предупреждает. Блокирует firewall/IPS. 🔑 detect + alert"],
+["What does a firewall do?",["Prevents unauthorized access","Encrypts all network data","Detects malware","Blocks email traffic"],0,"Firewall не пропускает неавторизованный трафик. 🔑 блок доступа"],
+["What is corporate espionage?",["Unauthorized data collection by competitors","Illegal monitoring of social media accounts","Encryption of sensitive business emails","Marketing strategies targeting competitors"],0,"Конкуренты незаконно собирают ваши данные. 🔑 шпионаж конкурентов"],
+["How can phishing attacks be mitigated?",["Providing employee training","Using encryption protocols","Disabling firewalls","Disabling password policies"],0,"Фишинг обманывает людей → лучшая защита — обучение. 🔑 training"],
+["What is the key difference between a virus and a Trojan horse?",["Trojans disguise themselves as legitimate software","Viruses only affect mobile devices","Trojans spread automatically","Viruses need user permissions to run"],0,"Троян выдаёт себя за нормальную программу. 🔑 маскировка"],
+["Which attack overwhelms a system with traffic?",["Keylogger attack","DDoS attack","Ransomware attack","Phishing attack"],1,"DDoS заваливает систему трафиком. 🔑 перегруз"],
+["What is a botnet?",["A network of malware-infected devices","A server management system","A cybersecurity tool","A method of encryption"],0,"Ботнет — сеть заражённых устройств под управлением атакующего. 🔑 зомби-сеть"],
+["What is the primary goal of a DDoS attack?",["Flood the system with traffic","Encrypt user data","Steal passwords","Disguise malware"],0,"Затопить трафиком, чтобы сервис упал. 🔑 flood"],
+["What is an ICMP flood?",["A DDoS attack that sends echo requests","A phishing scam","An attack targeting routers","A malware attack"],0,"Масса ping-пакетов (echo request). 🔑 ping"],
+["What makes SYN flood attacks dangerous?",["They exhaust server resources","They encrypt communication channels","They rely on email phishing","They disable antivirus programs"],0,"Много полуоткрытых соединений → у сервера кончаются ресурсы. 🔑 исчерпание ресурсов"],
+["What method helps mitigate SYN flood attacks?",["MAC filtering","SYN cookies","IP spoofing","DDoS reflection"],1,"SYN cookies — сервер не хранит полуоткрытые соединения. 🔑 SYN cookies"],
+["What does HTTP flood target in an attack?",["Operating system vulnerabilities","Web applications","Network routers","Database servers"],1,"HTTP flood бьёт по веб-приложениям (7 уровень OSI). 🔑 веб-приложения"],
+["What is a R.U.D.Y. attack?",["A phishing scheme","A slow-rate DDoS attack","A ransomware virus","A SQL injection attack"],1,"R U Dead Yet — очень медленно шлёт POST, держит соединения. 🔑 slow-rate"],
+["What does the term “Pingback DDoS” refer to?",["DNS manipulation","Reflection-based attacks using WordPress","IP address spoofing","SQL injection"],1,"Используется функция pingback в WordPress для отражения трафика. 🔑 WordPress"],
+["What is a DNS flood attack?",["An attack on encrypted traffic","A flood of DNS requests","An injection of DNS records","An unauthorized data access"],1,"Поток DNS-запросов перегружает DNS-сервер. 🔑 DNS-запросы"],
+["What is the main advantage of WPA3 over WPA2?",["Faster network speed","Improved encryption and security","Reduced network interference","Easier password recovery"],1,"WPA3 — сильнее шифрование и защита. 🔑 лучше шифрование"],
+["What is the most secure Wi-Fi protocol available today?",["WPA2","WPA3","WEP","TKIP"],1,"WPA3 самый новый и защищённый, WEP и TKIP устарели. 🔑 WPA3"],
+["What does MAC filtering do?",["Encrypts network packets","Restricts access based on device MAC addresses","Detects phishing attacks","Monitors CPU usage"],1,"Пускает только устройства с разрешёнными MAC-адресами. 🔑 по MAC"],
+["What is the role of a Data Loss Prevention (DLP) system?",["Monitor system performance","Encrypt SQL queries","Prevent unauthorized data loss","Detect malware in backups"],2,"DLP не даёт данным утечь наружу. 🔑 против утечки"],
+["What is the main risk of poor access control?",["Unauthorized data access","High hardware costs","Reduced system speed","Data replication issues"],0,"Слабый контроль → данные видит кто угодно. 🔑 неавторизованный доступ"],
+["How can organizations detect unauthorized access attempts?",["Using traffic logs","Increasing encryption levels","Disabling VPN access","Monitoring network speed"],0,"В логах трафика видны попытки входа. 🔑 логи"],
+["What is the purpose of a vulnerability scanner?",["Identify potential security weaknesses","Encrypt all user data","Disable unauthorized devices","Monitor network speed"],0,"Сканер ищет слабые места. 🔑 поиск слабостей"],
+["What is the primary objective of incident response?",["Restore systems and mitigate damage","Encrypt backup data","Increase network speed","Automate software updates"],0,"Восстановить системы и уменьшить ущерб. 🔑 восстановить + снизить ущерб"],
+["What is a common security risk with open database backups?",["Data theft","Faster data restoration","Improved encryption","Automated software updates"],0,"Открытый бэкап могут украсть. 🔑 кража данных"],
+["What is one key reason to perform regular backups?",["Increase query performance","Protect against data loss","Disable unauthorized access","Detect malware infections"],1,"Бэкапы защищают от потери данных. 🔑 потеря данных"],
+["What should organizations do after a database breach?",["Increase network speed","Conduct a forensic analysis","Disable all user accounts","Upgrade software licenses"],1,"После утечки — форензик-анализ: как это случилось. 🔑 forensics"],
+["What is the role of a firewall during a DDoS attack?",["Monitor DNS traffic","Block unauthorized access","Disable network encryption","Capture user passwords"],1,"Firewall блокирует вредный трафик. 🔑 блок"],
+["What is the common motivation behind DDoS attacks?",["To conduct network analysis","To disrupt services and damage reputation","To install malware","To block antivirus updates"],1,"Сорвать работу сервиса и испортить репутацию. 🔑 disruption"],
+["What is an example of a threat detected via network analysis?",["Abnormal port usage","Software update","Reduced data speed","Server restarts"],0,"Необычное использование портов — признак угрозы. 🔑 аномальные порты"],
+["What is the purpose of role-based access control (RBAC)?",["Encrypt network traffic","Limit access based on job roles","Monitor internet speed","Reduce query time"],1,"RBAC даёт доступ по должности (роли). 🔑 роль"],
+["Which businesses are most susceptible to DDoS attacks?",["Online retailers and gaming companies","Agricultural companies","Real estate firms","Local grocery stores"],0,"Онлайн-магазины и игры теряют деньги за каждую минуту простоя. 🔑 онлайн-бизнес"]
+];
+const V2=[
+["What is the purpose of encryption keys?",["Increase server bandwidth","Enable access to encrypted data","Speed up database queries","Enhance data compression"],1,"Ключ нужен, чтобы расшифровать данные. 🔑 ключ = доступ"],
+["Which protocol is vulnerable to DNS reflection attacks?",["FTP","UDP","TCP","SMTP"],1,"DNS работает по UDP, а UDP не проверяет отправителя → IP легко подделать. 🔑 UDP"],
+["What is an HTTPS flood?",["A malware injection","An attack on encrypted traffic","An advanced VPN attack","A method of encryption"],1,"HTTP flood по зашифрованному трафику, серверу ещё и расшифровывать. 🔑 encrypted traffic"],
+["Which attack exploits vulnerabilities in SQL databases?",["Phishing attack","SQL injection","DDoS attack","Keylogger attack"],1,"Внедрение SQL-кода в запросы к БД. 🔑 SQL"],
+["What is the goal of multi-factor authentication (MFA)?",["Require multiple forms of verification","Monitor unauthorized devices","Disable encryption protocols","Automate login processes"],0,"Несколько способов подтвердить личность. 🔑 несколько факторов"],
+["What is a WPA3 improvement over WPA2?",["Lower battery usage","Easier password recovery","Better network bandwidth","Enhanced encryption"],3,"Главное — более сильное шифрование. 🔑 encryption"],
+["What is the purpose of a vulnerability scanner?",["Disable unauthorized devices","Monitor network speed","Encrypt all user data","Identify potential security weaknesses"],3,"Сканер ищет слабые места. 🔑 поиск слабостей"],
+["Which tool helps analyze network traffic?",["Firewall","Wireshark","VPN","Antivirus"],1,"Wireshark — анализатор сетевого трафика. 🔑 Wireshark"],
+["What type of access control limits user permissions by role?",["DDoS protection","Role-based access control (RBAC)","VPN filtering","SQL injection"],1,"RBAC — права по роли. 🔑 роль"],
+["What makes WPA3 the most secure Wi-Fi protocol?",["Automated software updates","Faster connections","Stronger encryption","Lower power usage"],2,"Более сильное шифрование. 🔑 stronger encryption"],
+["Which security risk arises from excessive user privileges?",["Faster server response","Increased encryption levels","Unauthorized actions","Improved query performance"],2,"Лишние права → можно сделать то, что не положено. 🔑 лишние права"],
+["What is phishing?",["Encrypting network packets","Sending malicious traffic to a website","Tricking users into giving personal information","Detecting unauthorized access attempts"],2,"Обман, чтобы человек сам отдал данные. 🔑 обман"],
+["What is the main goal of information availability?",["Ensure systems are accessible when needed","Increase system bandwidth","Encrypt all data during transmission","Limit network access"],0,"Система доступна, когда нужна. 🔑 accessible"],
+["What is the role of a Data Loss Prevention (DLP) system?",["Encrypt SQL queries","Monitor system performance","Prevent unauthorized data loss","Detect malware in backups"],2,"DLP не даёт данным утечь. 🔑 против утечки"],
+["What is the purpose of network segmentation?",["Automate login attempts","Monitor user behavior","Limit the spread of cyberattacks","Increase query speed"],2,"Атака не расползается по всей сети. 🔑 ограничить распространение"],
+["What is the primary objective of incident response?",["Restore systems and mitigate damage","Increase network speed","Automate software updates","Encrypt backup data"],0,"Восстановить системы и уменьшить ущерб. 🔑 восстановить + снизить ущерб"],
+["What is SYN flooding?",["An attack that exhausts server resources","A phishing technique","A method of data encryption","A VPN setup issue"],0,"Полуоткрытые соединения забивают сервер. 🔑 исчерпание ресурсов"],
+["What does the term ‘breach analysis’ mean?",["Running software updates","Investigating how a network was compromised","Analyzing encrypted data","Automating traffic analysis"],1,"Разбор, как именно взломали сеть. 🔑 как взломали"],
+["What does a MAC filter do?",["Restricts access based on device MAC addresses","Monitors CPU usage","Detects phishing attacks","Encrypts network packets"],0,"Пускает только разрешённые MAC-адреса. 🔑 по MAC"],
+["How does encryption help databases?",["It prevents unauthorized access","It allows password recovery","It blocks phishing attempts","It speeds up queries"],0,"Посторонние не прочитают данные. 🔑 защита от доступа"],
+["What is a R.U.D.Y. attack?",["A phishing campaign","A slow-rate DDoS attack","A ransomware technique","A password brute-force attack"],1,"Медленная DDoS: медленно шлёт POST и держит соединения. 🔑 slow-rate"],
+["Which security protocol replaced WEP?",["WPA","RSA","WPA2","AES"],0,"WEP заменили на WPA (временно), потом пришёл WPA2. 🔑 WEP → WPA"],
+["What are SYN cookies used for?",["Encrypt network data","Monitor phishing attempts","Mitigate SYN flood attacks","Detect keyloggers"],2,"Защита от SYN flood. 🔑 SYN cookies"],
+["What is the role of access control?",["Automate software updates","Monitor CPU usage","Increase system speed","Limit access to authorized users"],3,"Пускать только авторизованных. 🔑 только свои"],
+["What is the purpose of WPA?",["Monitor VPN traffic","Protect Wi-Fi networks","Block DDoS attacks","Encrypt SQL databases"],1,"WPA защищает Wi-Fi. 🔑 Wi-Fi"],
+["What helps prevent SQL injection attacks?",["Input validation and sanitization","MAC filtering","Using firewalls","VPN services"],0,"Проверка и очистка ввода — SQL-код не вставить. 🔑 input validation"],
+["What is an ICMP flood attack?",["A DDoS attack using echo requests","A password cracking method","A phishing scheme","A network encryption tool"],0,"Масса ping-запросов (echo request). 🔑 ping"],
+["What is a DNS flood?",["Malware infection","A phishing attempt","A DDoS attack targeting DNS servers","An SQL injection method"],2,"DDoS на DNS-серверы. 🔑 DNS-серверы"],
+["Which attack method sends many GET or POST requests?",["HTTP flood","Phishing","SQL injection","SYN flood"],0,"HTTP flood = масса GET/POST. 🔑 GET/POST"],
+["What is the purpose of a security audit?",["Monitor CPU usage","Automate system backups","Assess compliance with security policies","Increase bandwidth"],2,"Аудит проверяет соблюдение политик. 🔑 compliance"],
+["What is Wi-Fi MAC filtering?",["Allows or blocks devices based on MAC addresses","Encrypts passwords","Blocks SQL injections","Monitors system uptime"],0,"Разрешает/блокирует устройства по MAC. 🔑 по MAC"],
+["What is a botnet?",["A network of malware-infected devices","An encryption protocol","A password manager","A VPN service"],0,"Сеть заражённых устройств. 🔑 зомби-сеть"],
+["What are SYN flood attacks designed to do?",["Install spyware","Exhaust server resources","Encrypt network traffic","Increase query speed"],1,"Исчерпать ресурсы сервера. 🔑 исчерпание ресурсов"],
+["What does a firewall do?",["Encrypts network traffic","Blocks unauthorized access","Detects SQL injections","Monitors CPU usage"],1,"Блокирует неавторизованный доступ. 🔑 блок доступа"],
+["What is the difference between WPA2 and WPA3?",["WPA3 disables VPN access","WPA3 offers stronger encryption","WPA3 is older than WPA2","WPA3 requires less bandwidth"],1,"WPA3 новее и шифрует сильнее. 🔑 stronger"],
+["How do DLP systems protect organizations?",["Monitor network speed","Encrypt user accounts","Prevent unauthorized data loss","Block phishing emails"],2,"Не дают данным утечь. 🔑 против утечки"],
+["Which businesses are most vulnerable to DDoS attacks?",["Manufacturing plants","Financial institutions","Local restaurants","Farms"],1,"Банки: большие деньги и сервисы должны работать всегда. 🔑 банки"],
+["What is HTTPS used for?",["Disable firewalls","Encrypt web traffic","Optimize network speed","Block spam"],1,"HTTPS шифрует веб-трафик. 🔑 web encryption"],
+["What is the primary purpose of encryption?",["Improve network speed","Automate software updates","Protect data from unauthorized access","Monitor CPU usage"],2,"Защитить данные от посторонних. 🔑 защита от доступа"],
+["What is corporate espionage?",["Encrypting traffic","Stealing confidential data","Monitoring email servers","Blocking malware"],1,"Кража конфиденциальных данных. 🔑 кража"],
+["What is the main purpose of forensic analysis in cybersecurity?",["Automate system updates","Encrypt network logs","Identify software vulnerabilities","Reconstruct events from a security breach"],3,"Восстановить по шагам, что было при взломе. 🔑 reconstruct"],
+["What does role-based access control (RBAC) achieve?",["Disables unauthorized Wi-Fi connections","Limits access based on user roles","Automates database queries","Encrypts all network traffic"],1,"Доступ по роли. 🔑 роль"],
+["What is the first step in incident response?",["Encrypt data backups","Restore network speed","Identify the incident","Disable all user accounts"],2,"Сначала обнаружить и определить инцидент. 🔑 identify"],
+["How do SYN cookies help protect systems?",["Speed up packet transmission","Mitigate SYN flood attacks","Encrypt IP addresses","Disable unused network ports"],1,"Защищают от SYN flood. 🔑 SYN cookies"],
+["What is the impact of DNS reflection attacks?",["Encrypt server data","Overload the target with amplified traffic","Disable antivirus software","Scan for open ports"],1,"Отражение усиливает трафик и перегружает жертву. 🔑 amplification"],
+["What makes IoT devices vulnerable to cyberattacks?",["They are expensive to secure","They often lack strong security protocols","They block unauthorized traffic by default","They use encrypted connections"],1,"Слабая защита: дефолтные пароли, нет обновлений. 🔑 слабая защита"],
+["What helps detect unauthorized access attempts?",["Using MAC filtering","Increasing bandwidth","Analyzing network traffic logs","Disabling encryption protocols"],2,"Логи трафика показывают попытки входа. 🔑 логи"],
+["What does WPA stand for?",["Wireless Protected Access","Web Page Access","Wi-Fi Protected Area","Wireless Protocol Agreement"],0,"Правильно Wi-Fi Protected Access, ближе всего вариант A. 🔑 Protected Access"],
+["How does WPA3 improve Wi-Fi security?",["Introduces stronger encryption and protects against weak passwords","Replaces MAC filtering","Requires fewer authentication steps","Uses weaker encryption for faster performance"],0,"Сильнее шифрование + защита от подбора слабых паролей (SAE). 🔑 SAE"],
+["What is MAC filtering used for?",["Monitor database performance","Allow or block devices based on their MAC addresses","Encrypt network traffic","Increase bandwidth"],1,"Разрешает/блокирует устройства по MAC. 🔑 по MAC"]
+];
+const $=id=>document.getElementById(id);
+let list=[],i=0,score=0,wrong=[],locked=false;
+const sh=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
+function show(id){['menu','quiz','res'].forEach(x=>$(x).classList.toggle('hide',x!==id));window.scrollTo(0,0)}
+function menu(){show('menu')}
+function start(m,custom){
+ let src=custom||(m==='v1'?V1.map((q,n)=>[...q,'v1']):m==='v2'?V2.map((q,n)=>[...q,'v2']):[...V1.map(q=>[...q,'v1']),...V2.map(q=>[...q,'v2'])]);
+ if($('shuf').classList.contains('on'))src=sh(src);
+ list=src;i=0;score=0;wrong=[];show('quiz');render();
+}
+function render(){
+ locked=false;const q=list[i];
+ let idx=[0,1,2,3];if($('shufo').classList.contains('on'))idx=sh(idx);
+ $('cnt').textContent=(i+1)+' / '+list.length;$('sc').textContent=score;
+ $('pb').style.width=(i/list.length*100)+'%';
+ const L='ABCD';
+ $('box').innerHTML='<div class="card"><span class="tag">MID '+q[4]+'</span><p class="q">'+q[0]+'</p>'+
+ idx.map((o,k)=>'<button class="opt" data-o="'+o+'" onclick="pick(this)"><b>'+L[k]+'</b><span>'+q[1][o]+'</span></button>').join('')+'<div id="after"></div></div>';
+}
+function pick(el){
+ if(locked)return;locked=true;const q=list[i],o=+el.dataset.o,ok=o===q[2];
+ document.querySelectorAll('.opt').forEach(b=>{const v=+b.dataset.o;if(v===q[2])b.classList.add('ok');else if(b!==el)b.classList.add('dim')});
+ if(ok){score++;$('sc').textContent=score;if(navigator.vibrate)navigator.vibrate(15)}else{el.classList.add('bad');wrong.push(q);if(navigator.vibrate)navigator.vibrate([40,40,40])}
+ $('after').innerHTML='<div class="exp">'+(ok?'✅ Верно! ':'❌ Неверно. ')+q[3]+'</div><button class="btn" onclick="next()">'+(i+1<list.length?'Дальше →':'Результат 🏁')+'</button>';
+ $('after').scrollIntoView({behavior:'smooth',block:'end'});
+}
+function next(){i++;if(i<list.length)render();else finish()}
+function finish(){
+ $('pb').style.width='100%';const p=Math.round(score/list.length*100);
+ const col=p>=80?'#22c55e':p>=50?'#f59e0b':'#ef4444';
+ show('res');
+ $('res').innerHTML='<h1>Результат</h1><div class="ring" id="rg"><span>'+p+'%</span></div><p class="sub">'+score+' из '+list.length+' правильно</p>'+
+ (wrong.length?'<button class="btn" onclick="retry()">Повторить ошибки ('+wrong.length+')</button>':'<p>🔥 Без ошибок!</p>')+
+ '<button class="btn ghost" onclick="menu()">В меню</button>';
+ let a=0;const t=setInterval(()=>{a+=2;if(a>=p){a=p;clearInterval(t)}$('rg').style.background='conic-gradient('+col+' '+a+'%,#24264a 0)'},16);
+}
+function retry(){start(null,wrong.slice())}
+</script>
+</body>
+</html>
